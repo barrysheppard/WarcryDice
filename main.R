@@ -74,7 +74,90 @@ names(plot_percentages) <- c('Single', 'Double', 'Triple', 'Quad', 'Quint', 'Sex
 
 plot(plot_percentages, type = 's', xlab = 'At least one group of this many dice',
      ylab = '% chance of each result', main = 'Warcry Initiative and Ability Dice')
-?plot
+
+# Next lets look at an battle withthe Iron Golem's leader versus the Untamed Leader
+
+# The Iron Golem Leader has 20 Health, 4 toughness, 3 attacks, 5 strength, 2/5 damage.
+# The Untamed Leader has 20 Health, 4 toughness, 4 attacks, 4 strength, 2/5 damage.
+
+# In a typical attack action, the Iron Golem leader will roll 3 dice and will need
+# a 3, 4 or 5 on a die to do 2 damage as str is greater and 6 on a die to do 5 damage.
+ig_attack <- c(0,0,2,2,2,5)
+3 * mean(ig_attack) # 5.5 expected damage per attack action
+
+# fuction for monte carlo results
+attack_results <- function(str, toughness, attacks, dmg, crit_dmg) {
+  
+  # first we build the dice table
+  if (str > toughness) {
+    dice <- c(0,0,dmg,dmg,dmg,crit_dmg)
+  }
+  if (str == toughness) {
+    dice <- c(0,0,0,dmg,dmg,crit_dmg)
+  }
+  if (str < toughness) {
+    dice <- c(0,0,0,0,dmg,crit_dmg)
+  }
+  
+  results <- c()
+  for (i in 1:10000) {
+    roll <- sample(dice, attacks)
+    total <- sum(roll)
+    results <- c(results, total)
+  }
+  table_result <- table(results) / sum(table(results)) * 100
+  return(table_result)
+}
+
+# The Iron Golem Dominar has 20 Health, 4 toughness, 3 attacks, 5 strength, 2/5 damage.
+# The Untamed Heart-Eater has 20 Health, 4 toughness, 4 attacks, 4 strength, 2/5 damage.
+
+ig_attacks <- attack_results(str = 5, toughness = 4, attacks = 3, dmg = 2, crit_dmg = 5)
+barplot(ig_attacks, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Dominar attacks Heart-Eater', ylim = c(0, 50))
+
+# The Iron Golem Dominar has 20 Health, 4 toughness, 3 attacks, 5 strength, 2/5 damage.
+# The Untamed Heart-Eater has 20 Health, 4 toughness, 4 attacks, 4 strength, 2/5 damage.
+
+ut_attacks <- attack_results(str = 4, toughness = 4, attacks = 4, dmg = 2, crit_dmg = 5)
+barplot(ut_attacks, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Heart-Eater attacks Dominar', ylim = c(0, 50))
+
+# looking at the random guys, the plains-runners
+ut_attacks <- attack_results(str = 3, toughness = 4, attacks = 3, dmg = 1, crit_dmg = 3)
+barplot(ut_attacks, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Plains-runner attacks Dominar', ylim = c(0, 50))
+
+
+# looking at the prey taker's weapon options, the sawtooth blade or the fanged axe
+par( mfrow = c(3,2) )
+ut_attacks <- attack_results(attacks = 3, str = 4, dmg = 2, crit_dmg = 4, toughness = 3)
+barplot(ut_attacks, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Prey Taker with Fanged Axe vs Toughness 3', ylim = c(0, 50))
+ut_attacks <- attack_results(attacks = 4, str = 3, dmg = 2, crit_dmg = 4, toughness = 3)
+barplot(ut_attacks, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Prey Taker with Sawtooth Blade vs Toughness 3', ylim = c(0, 50))
+ut_attacks <- attack_results(attacks = 3, str = 4, dmg = 2, crit_dmg = 4, toughness = 4)
+barplot(ut_attacks, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Prey Taker with Fanged Axe vs Toughness 4', ylim = c(0, 50))
+ut_attacks <- attack_results(attacks = 4, str = 3, dmg = 2, crit_dmg = 4, toughness = 4)
+barplot(ut_attacks, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Prey Taker with Sawtooth Blade vs Toughness 4', ylim = c(0, 50))
+ut_attacks <- attack_results(attacks = 3, str = 4, dmg = 2, crit_dmg = 4, toughness = 5)
+barplot(ut_attacks, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Prey Taker with Fanged Axe vs Toughness 5', ylim = c(0, 50))
+ut_attacks <- attack_results(attacks = 4, str = 3, dmg = 2, crit_dmg = 4, toughness = 5)
+barplot(ut_attacks, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Prey Taker with Sawtooth Blade vs Toughness 5', ylim = c(0, 50))
 
 
 
+par( mfrow = c(1,1) )
+damage <- attack_results(attacks = 2, str = 6, dmg = 4, crit_dmg = 8, toughness = 4)
+barplot(damage, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Ogor Breacher vs Toughness 5 or less', ylim = c(0, 50))
+
+par( mfrow = c(1,1) )
+damage <- attack_results(attacks = 4, str = 4, dmg = 2, crit_dmg = 4, toughness = 4)
+barplot(damage, xlab = 'Damage', ylab = 'Percentage', 
+        main  = 'Drill Master vs Toughness 4', ylim = c(0, 50))
